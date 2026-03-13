@@ -60,7 +60,7 @@ def login():
 
     cursor = conn.cursor(dictionary=True)
     cursor.execute(
-        "SELECT * FROM USERS WHERE username=%s AND password=%s",
+        "SELECT * FROM user WHERE username=%s AND password_hash=%s",
         (username, password)
     )
     user = cursor.fetchone()
