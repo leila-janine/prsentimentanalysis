@@ -14,8 +14,7 @@ from sentiment_engine import analyze_sentiment, generate_category_scores
 app = Flask(__name__)
 CORS(app)
 
-# Cloud Security Upgrade: It will look for a hidden Render variable first, 
-# but will fall back to your default if running locally.
+# Cloud Security Upgrade
 SECRET_KEY = os.environ.get("SECRET_KEY", "Leilas_Super_Secret_Park_Ranger_Key_99!")
 
 # ------------------- INPUT SANITIZATION -------------------
@@ -59,6 +58,7 @@ def login():
         return jsonify({"status": "db connection failed"}), 500
 
     cursor = conn.cursor(dictionary=True)
+    # Fixed table name to lowercase 'user' and 'password_hash'
     cursor.execute(
         "SELECT * FROM user WHERE username=%s AND password_hash=%s",
         (username, password)
@@ -89,8 +89,9 @@ def add_product(current_user):
         return jsonify({"status": "db connection failed"}), 500
 
     cursor = conn.cursor()
+    # Fixed table name to lowercase 'product'
     cursor.execute(
-        "INSERT INTO PRODUCT (product_name, performance_tier, sentiment_rate) VALUES (%s,%s,%s)",
+        "INSERT INTO product (product_name, performance_tier, sentiment_rate) VALUES (%s,%s,%s)",
         (name, tier, rate)
     )
 
@@ -107,7 +108,8 @@ def get_products():
         return jsonify({"status": "db connection failed"}), 500
 
     cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM PRODUCT")
+    # Fixed table name to lowercase 'product'
+    cursor.execute("SELECT * FROM product")
     products = cursor.fetchall()
 
     cursor.close()
@@ -139,9 +141,9 @@ def add_feedback(current_user):
 
         cursor = conn.cursor()
 
-        # Insert feedback
+        # Fixed table name to lowercase 'feedback'
         cursor.execute(
-            """INSERT INTO FEEDBACK 
+            """INSERT INTO feedback 
             (location_id, product_id, source_id, feedback_text, sentiment_label, sentiment_score) 
             VALUES (%s,%s,%s,%s,%s,%s)""",
             (loc_id, prod_id, src_id, text, label, score)
@@ -152,8 +154,9 @@ def add_feedback(current_user):
         # Generate category ratings
         scores = generate_category_scores(score)
 
+        # Fixed table name to lowercase 'category_rating'
         cursor.execute(
-            """INSERT INTO CATEGORY_RATING 
+            """INSERT INTO category_rating 
             (feedback_id, taste_score, quality_score, value_score, service_score, presentation_score)
             VALUES (%s,%s,%s,%s,%s,%s)""",
             (
@@ -189,11 +192,12 @@ def get_feedback():
 
     cursor = conn.cursor(dictionary=True)
 
+    # Fixed table names to lowercase 'feedback' and 'category_rating'
     cursor.execute("""
         SELECT f.*, c.taste_score, c.quality_score, c.value_score,
                c.service_score, c.presentation_score
-        FROM FEEDBACK f
-        LEFT JOIN CATEGORY_RATING c ON f.feedback_id = c.feedback_id
+        FROM feedback f
+        LEFT JOIN category_rating c ON f.feedback_id = c.feedback_id
     """)
 
     feedbacks = cursor.fetchall()
@@ -211,7 +215,8 @@ def get_locations():
         return jsonify({"status": "db connection failed"}), 500
 
     cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM LOCATION")
+    # Fixed table name to lowercase 'location'
+    cursor.execute("SELECT * FROM location")
     rows = cursor.fetchall()
 
     cursor.close()
