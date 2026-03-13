@@ -119,8 +119,7 @@ def get_products():
 
 # ------------------- FEEDBACK (WITH NLP) -------------------
 @app.route("/feedback", methods=["POST"])
-@token_required
-def add_feedback(current_user):
+def add_feedback():
     data = request.json
 
     try:
